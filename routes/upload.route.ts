@@ -6,5 +6,6 @@ const upload = multer();
 
 router.post('/upload',upload.array("files"), uploadController.upload)
 router.patch('/change-file-name',upload.none(), uploadController.changeFileName)
+router.patch('/delete-file',upload.none(), uploadController.deleteFileName)
 
 export default router;

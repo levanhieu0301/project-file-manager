@@ -83,3 +83,43 @@ try {
 }
 
 }
+
+
+export const deleteFileName = (req: Request, res: Response) => {
+try {
+    const {folder,fileName} = req.body;
+
+  if(!folder || !fileName) {
+    res.json({
+      code: "error",
+      message: "Thiếu thông tin cần thiết!"
+    })
+    return;
+  }
+  // Tạo đường dẫn đến thư mục đó
+  const cleanFolder = folder.replace("/", "")// làm sạch đường dẫn
+  const mediaDir = path.join(__dirname, "..", cleanFolder)
+  const deletePath = path.join(mediaDir, fileName);
+  if(!existsSync(deletePath)){
+    res.json({
+        code: "error",
+        message: "File không tồn tại!"
+      })
+      return;
+
+  }
+   // Đổi tên file
+    fs.unlinkSync(deletePath);
+
+    res.json({
+      code: "success",
+      message: "Thành công!"
+    })
+} catch (error) {
+    res.json({
+      code: "error",
+      message: "Lỗi server khi đổi tên file!"
+    })
+}
+
+}
