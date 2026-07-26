@@ -1,5 +1,5 @@
 import  { Request, Response } from "express"
-import fs from "fs"
+import fs, { existsSync } from "fs"
 import path from "path"
 
 export const upload = (req: Request, res: Response) => {
@@ -35,4 +35,51 @@ export const upload = (req: Request, res: Response) => {
       message:"Lỗi upload!",
     })
   }
+}
+
+export const changeFileName = (req: Request, res: Response) => {
+try {
+    const {folder, oldName, newName} = req.body;
+
+  if(!folder || !oldName || !newName) {
+    res.json({
+      code: "error",
+      message: "Thiếu thông tin cần thiết!"
+    })
+    return;
+  }
+  // Tạo đường dẫn đến thư mục đó
+  const cleanFolder = folder.replace("/", "")// làm sạch đường dẫn
+  const mediaDir = path.join(__dirname, "..", cleanFolder)
+  const oldPath = path.join(mediaDir, oldName);
+  const newPath = path.join(mediaDir, newName);
+  if(!existsSync(oldPath)){
+    res.json({
+        code: "error",
+        message: "File không tồn tại!"
+      })
+      return;
+
+  }
+  if(fs.existsSync(newPath)) {
+      res.json({
+        code: "error",
+        message: "Tên file mới đã tồn tại!"
+      })
+      return;
+    }
+   // Đổi tên file
+    fs.renameSync(oldPath, newPath);
+
+    res.json({
+      code: "success",
+      message: "Thành công!"
+    })
+} catch (error) {
+    res.json({
+      code: "error",
+      message: "Lỗi server khi đổi tên file!"
+    })
+}
+
 }
