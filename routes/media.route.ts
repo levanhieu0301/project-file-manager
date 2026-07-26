@@ -6,4 +6,5 @@ const upload = multer();
 
 router.get('/:filename', mediaController.getFile)
 
+
 export default router;
