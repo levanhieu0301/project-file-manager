@@ -84,7 +84,6 @@ try {
 
 }
 
-
 export const deleteFileName = (req: Request, res: Response) => {
 try {
     const {folder,fileName} = req.body;
@@ -123,3 +122,75 @@ try {
 }
 
 }
+
+export const folderCreate = (req: Request, res: Response) => {
+try {
+    const { valueFolder } = req.body;
+  if(!valueFolder && typeof valueFolder !== "string"){
+    res.json({
+        code: "error",
+        message: "Tên thư mục không hợp lệ!"
+      })
+    return;
+  }
+  // Thư mục gốc
+  const mediaDir = path.join(__dirname, "..", "media")
+  // Tạo đường dẫn tạo folder
+  const createFolderPath = path.join(mediaDir, valueFolder)
+  // Kiểm  tra tên folder tồn tại hay chưa
+  if(fs.existsSync(createFolderPath)){
+    res.json({
+        code: "error",
+        message: "Folder đã tồn tại!"
+      })
+      return;
+  }
+  // Tạo folder
+  fs.mkdirSync(createFolderPath)
+  res.json({
+      code: "success",
+      message: "Thành công!"
+  })
+} catch (error) {
+   res.json({
+      code: "error",
+      message: "Lỗi server khi tạo folder!"
+    })
+}
+
+}
+export const folderList = (req: Request, res: Response) => {
+try {
+  const folders: any[] = []
+  //Tạo thư mục gốc
+  const mediaDir = path.join(__dirname, "..", "media")
+  // Lấy ra tất các file/ folder trong thư mục media
+  const list = fs.readdirSync(mediaDir)
+  //lặp qua danh sách Kiểm tra nào là folder 
+  list.forEach(item => {
+    // Tạo đường dẫn đến từng item để kiểm tra
+    const itemPath = path.join(mediaDir, item)
+    // Kiểm tra
+    const itemInfo = fs.statSync(itemPath) // trả về thông tin chi tiết 
+    // check thư mục 
+    if(itemInfo.isDirectory()){
+      folders.push({
+        nameFolder : item,
+        createdAt : itemInfo.birthtime
+      })
+    }
+  })
+  // Sắp xếp giảm dần theo ngày tạo
+  folders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+  res.json({
+      code: "success",
+      message: "Thành công!",
+      folderList: folders
+  })
+} catch (error) {
+  res.json({
+      code: "error",
+      message: "Lấy danh sách folder không thành công!"
+  })
+}}
