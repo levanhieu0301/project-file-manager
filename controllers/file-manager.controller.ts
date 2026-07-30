@@ -163,7 +163,11 @@ export const folderList = (req: Request, res: Response) => {
 try {
   const folders: any[] = []
   //Tạo thư mục gốc
-  const mediaDir = path.join(__dirname, "..", "media")
+  let mediaDir = path.join(__dirname, "..", "media")
+  // Lấy danh sách folder trong folder
+  if(req.query.folderPath !== "undefined"){
+    mediaDir = path.join(mediaDir, `${req.query.folderPath}`)
+  }
   // Lấy ra tất các file/ folder trong thư mục media
   const list = fs.readdirSync(mediaDir)
   //lặp qua danh sách Kiểm tra nào là folder 
@@ -182,6 +186,7 @@ try {
   })
   // Sắp xếp giảm dần theo ngày tạo
   folders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  console.log(folderList)
 
   res.json({
       code: "success",
