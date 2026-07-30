@@ -5,7 +5,12 @@ import path from "path"
 export const upload = (req: Request, res: Response) => {
   try {
      const files = req.files as Express.Multer.File[]
-    const mediaDir = path.join(__dirname, "../media")
+     const folderPath = req.body.folderPath
+
+    let mediaDir = path.join(__dirname, "../media")
+    if(folderPath != undefined){
+      mediaDir= path.join(mediaDir, folderPath)
+    }
     const saveLink : any[] = []
     files.forEach(file => {
       // Tên file muốn lưu
@@ -16,7 +21,7 @@ export const upload = (req: Request, res: Response) => {
       fs.writeFileSync(savePath, file.buffer)
       // lấy ra đường link trả về để lưu vào DB
       saveLink.push({
-        folder: "/media",
+        folder: "/media" + (folderPath != undefined ? `/${folderPath}` : ""),
         filename:filename,
         mimetype: file.mimetype,
         size: file.size
