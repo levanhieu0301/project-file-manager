@@ -125,7 +125,7 @@ try {
 
 export const folderCreate = (req: Request, res: Response) => {
 try {
-    const { valueFolder } = req.body;
+    const { valueFolder, folderCurrent } = req.body;
   if(!valueFolder && typeof valueFolder !== "string"){
     res.json({
         code: "error",
@@ -136,7 +136,7 @@ try {
   // Thư mục gốc
   const mediaDir = path.join(__dirname, "..", "media")
   // Tạo đường dẫn tạo folder
-  const createFolderPath = path.join(mediaDir, valueFolder)
+  const createFolderPath = path.join(mediaDir,folderCurrent || "", valueFolder)
   // Kiểm  tra tên folder tồn tại hay chưa
   if(fs.existsSync(createFolderPath)){
     res.json({
@@ -186,7 +186,6 @@ try {
   })
   // Sắp xếp giảm dần theo ngày tạo
   folders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  console.log(folderList)
 
   res.json({
       code: "success",
